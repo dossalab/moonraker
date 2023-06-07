@@ -450,9 +450,14 @@ class Machine:
     async def exec_sudo_command(
         self, command: str, tries: int = 1, timeout=2.
     ) -> str:
+        proc_input = None
+        full_cmd = f"sudo {command}"
+        if self._sudo_password is not None:
+            proc_input = self._sudo_password
+            full_cmd = f"sudo -S {command}"
         shell_cmd: SCMDComp = self.server.lookup_component("shell_command")
         return await shell_cmd.exec_cmd(
-            command, proc_input=None, log_complete=False, retries=tries,
+            full_cmd, proc_input=proc_input, log_complete=False, retries=tries,
             timeout=timeout
         )
 
